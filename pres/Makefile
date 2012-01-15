@@ -1,10 +1,18 @@
-overview.html: overview.md
-	markdown_py overview.md > overview.html
+markdown_srcs := $(wildcard *.md)
+markdown_web   = $(markdown_srcs:.md=.html)
+markdown_pres  = $(markdown_srcs:.md=_pres.html)
 
-overview_pres.html: overview.md
-	landslide overview.md -c -r -d overview_pres.html
+all : $(markdown_web) $(markdown_pres)
+
+%.html : %.md
+	markdown_py -x def_list -n $< -f $@
+%_pres.html : %.md
+	landslide -x def_list $< -c -r -d $@
 
 web: overview.html
 	open overview.html
 pres: overview_pres.html
 	open overview_pres.html
+
+clean: 
+	rm *.html
