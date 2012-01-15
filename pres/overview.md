@@ -1,14 +1,16 @@
-Introduction
-============
+Python for Scientists
+=====================
 
-This initial lecture is meant to help you understand how
-scripting languages fit into the toolbox of a computational
-scientist. There is a lot of talk about python in the scientific
-world that I was skeptical about until about 2 years ago. I came
-across a book whose introduction helped me see why scripting and
-python was useful. This introduction is an adaptation of that
-chapter of *Python Scripting for Computational Science* by Hans
-Petter Langtangen.
+### Class Objectives
+
+1. You will understand how scripting languages fit into the toolbox of
+a computational scientist.
+2. You will see why python is a powerful choice
+
+This introduction is an adaptation of the introduction of *Python
+Scripting for Computational Science* by Hans Petter Langtangen.
+
+![books](../graphics/books.png)
 
 ---
 
@@ -20,6 +22,7 @@ written at a low level. Scripting by contrast is programming at a
 very high level with flexible languages. 
 
 > Traditional programming: fortran, c, c++, c#, java
+>
 > Scripting: python, perl, ruby, (matlab)
 
 A major thrust of scripting is that you can automate many tasks
@@ -30,6 +33,7 @@ that otherwise you would do by hand.
 Has this ever happened to you?
 ------------------------------
 
+### Scene 1
 You are working on data for a presentation your advisor is giving
 at a conference. At the last minute, you realize that there is a
 major bug in your code and you need to regenerate all the images
@@ -37,25 +41,32 @@ and graphs that you have given him. You spend 30 minutes
 regenerating the data and 6 hours regenerating the graphs because
 you had them in Excel and had done them by hand.
 
+### Scene 2
 You are working on your thesis and as you near the finish you
 review some graphs you generated months earlier and you aren't
 sure if they are now completely up to date. You spend half a day
 locating the old code that you wrote on your second laptop and
 hours more again creating and polishing the charts.
 
+---
+
+Buyer Beware
+------------
+
 Learning to automate many of these common tasks can greatly
 increase your productivity (and make your research
 reproducible). However, beware that there is no end to the number
 of different ways to do essentially the same thing. 
+
 ![be careful](../graphics/careful.png "Recall we want to script to SAVE time")
 
 ---
-
 
 Why scripting is useful
 -----------------------
 
 There are perhaps many reasons, here we list a few:
+
 * scripting languages have nicer interfaces
 * allow you to build your own work environment
 * scientific computing is more than crunching numbers
@@ -68,9 +79,6 @@ There are perhaps many reasons, here we list a few:
 
 Is Python > Matlab?
 -------------------
-
-Clearly we are teaching a python course so we think that Python
-is more powerful. But how do they compare?
 
 ### Similarities
 
