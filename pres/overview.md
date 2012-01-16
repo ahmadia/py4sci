@@ -1,6 +1,11 @@
 Python for Scientists
 =====================
 
+---
+
+Introduction
+------------
+
 ### Class Objectives
 
 1. You will understand how scripting languages fit into the toolbox of
@@ -119,3 +124,99 @@ you know which tool is right for the job?
 * The CPU-intensive parts of your application may be migrated to C or Fortran
 * Your application is largely based on common objects found in computer science
 
+---
+
+Some Sample Applications
+========================
+
+---
+
+Teaching the finite element method
+----------------------------------
+
+### Stiffness matrix computation
+
+![fem](../graphics/fem.png "")
+
+---
+
+Monitor program progress
+------------------------
+
+### Python parses a datafile and makes plots of current progress
+
+![log](../graphics/log.png "")
+
+---
+
+Problem prototypes
+------------------
+
+### Nonlinear, time dependent problem
+
+![dsw](../graphics/dsw.png "")
+
+---
+
+Problem prototypes
+------------------
+
+### Method for fitting surface to data
+
+![molt](../graphics/molt.png "")
+
+---
+
+Structural program
+------------------
+
+### Python manages floors and columns
+
+![struct](../graphics/struct.png "")
+
+---
+
+Auto-generation of results
+--------------------------
+
+### Python runs my c-code, post-processes the results, and generates the latex table
+
+![dpg](../graphics/dpg.png "")
+
+---
+
+Beginner's Guide
+================
+
+---
+
+Script 1
+--------
+
+    #!/usr/bin/env python
+    import sys,math
+    try:
+        r = float(sys.argv[1])
+    except:
+        print "No value specified"
+        sys.exit()
+    s = math.sin(r)
+    print "Hello world, sin(%f)=%f" % (r,s)
+
+---
+
+
+Script 2
+--------
+
+    #!/usr/bin/env python
+    import sys,math
+    try:
+        r = float(sys.argv[1])
+    except:
+        print "No value specified"
+        sys.exit()
+    s = math.sin(r)
+    print "Hello world, sin(%f)=%f" % (r,s)
+
+---
