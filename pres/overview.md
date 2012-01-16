@@ -205,18 +205,85 @@ Script 1
 
 ---
 
-
 Script 2
 --------
 
     #!/usr/bin/env python
     import sys,math
     try:
-        r = float(sys.argv[1])
+        infile = sys.argv[1]; outfile = sys.argv[2]
     except:
-        print "No value specified"
-        sys.exit()
-    s = math.sin(r)
-    print "Hello world, sin(%f)=%f" % (r,s)
+        print "Usage: %s infile outfile" % sys.argv[0]; sys.exit(1)
+    f = open(infile,'r')
+    g = open(outfile,'w')
+
+    def func(y):
+    	if y >= 0.0:
+    	   return y**5.0*math.exp(-y)
+    	else:
+           return 0.0
+
+    for line in f:
+    	line = line.split()
+        x = float(line[0]); y = float(line[1])
+    	fy = func(y)
+    	g.write("%g %12.5e\n" % (x,fy))
+    f.close(); g.close()
 
 ---
+
+How to format
+-------------
+
+![table](../graphics/tbl.png "")
+
+---
+
+Script 3
+--------
+
+    import sys,os
+    cmd = 'date'
+    output = os.popen(cmd)
+    lines = output.readlines()
+    fail = output.close()
+    if fail: print 'You do not have the date command'; sys.exit()
+    for line in lines:
+        line = line.split()
+        print "The current time is %s on %s %s, %s" % (line[3],line[2],line[1],line[-1])
+
+---
+
+A Bib-file
+----------
+
+    @Book{Langtangen2011,
+      author = 	  {Hans Petter Langtangen},
+      title = 	  {A Primer on Scientific Programming with Python},
+      publisher = {Springer},
+      year = 	  {2011}
+    }
+    @Book{Langtangen2010,
+      author = 	  {Hans Petter Langtangen},
+      title = 	  {Python Scripting for Computational Science},
+      publisher = {Springer},
+      year = 	  {2010}
+    }
+
+---
+
+Script 4
+--------
+
+    #!/usr/bin/env python
+    import re
+    pattern1 = "@Book{(.*),"
+    pattern2 = "\s+title\s+=\s+{(.*)},"
+    book = ''
+    books = []
+    for line in file('test.bib'):
+    	match = re.search(pattern1,line)
+    	if match: print "Found a book with the tag '%s'" % match.group(1)
+    	match = re.search(pattern2,line)
+    	if match: print "The title is '%s'" % match.group(1)
+	
