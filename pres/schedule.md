@@ -7,7 +7,7 @@
 ### Break
 
 ## 11:00-12:00 Aron Ahmadia
-### Introduction to ipython, numpy, and Python syntax 
+### Sudoku in Python
 
 ## 12:00-1:00
 ### Lunch Break
