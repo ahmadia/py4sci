@@ -147,7 +147,7 @@ solution):
     ##   values is a dict of possible values, e.g. {'A1':'12349', 'A2':'8', ...}
 
 Norvig's strategy is already apparent in the first several lines of code.  He will maintain a
-dictionary, *values*, that contains a character string of uneliminated candidate digits for each
+dictionary, `values`, that contains a character string of uneliminated candidate digits for each
 square on the grid.  He will then use a strategy to eliminate candidate digits from the dictionary
 until there is only one uneliminated digit for each square in the dictionary.  
 
@@ -169,7 +169,7 @@ Now he defines a simple function to take Cartesian products (used in setup).
       return [a+b for a in A for b in B]
 
 Notice the list comprehension!  Also, this code is slightly out of date, since the modern
-*itertools* module, built-in to Python, contains a *product* function that performs a very similar
+`itertools` module, built-in to Python, contains a `product` function that performs a very similar
 operation so that cross could have been implemented slightly more efficiently like this:
 
     !python
@@ -177,17 +177,17 @@ operation so that cross could have been implemented slightly more efficiently li
       "Cross product of elements in A and elements in B."
       map(''.join,itertools.product(a,b))
 
-Here, the funny *''.join"*  notation and use of *map* are to keep a consistent format with Norvig's
+Here, the funny `''.join"`  notation and use of `map` are to keep a consistent format with Norvig's
 string data objects (Norvig uses 'A1' instead of ('A','1'), the natural tuple that would arise from
-a Cartesian product of two character sets.  Get used to *.join*, a very useful method that belongs
-to all string objects. For any string object *s*, *s.join* concatenates two or more strings using
-*s* as the separator between elements.  For example, we could have used *'.'.join* if we wanted 'A.1'.
+a Cartesian product of two character sets.  Get used to `.join`, a very useful method that belongs
+to all string objects. For any string object `s`, `s.join` concatenates two or more strings using
+`s` as the separator between elements.  For example, we could have used `'.'.join` if we wanted 'A.1'.
 
 * * * * *
 # Code Setup - Basic Data
 
 A Python file containing source code is often referred to as a *module*.  To make use of a Python
-module (on the path), it is customary to load the module using an *import* statement:
+module (on the path), it is customary to load the module using an `import` statement:
 
     !python
     import sudoku
@@ -235,17 +235,17 @@ containing 9 string entries.
 # Code Setup - Advanced Data II
 
 Norvig now sets up two dictionaries that will assist in eliminating candidate digits.  The first
-dictionary, *units*, associates each square with the three units that it belongs to, allowing him to
+dictionary, `units`, associates each square with the three units that it belongs to, allowing him to
 ask (and answer) the question "To which list of units does square s belong?" by using s as a key to the
 dictionary.  Notice the use of an outer (non-nested) generator
-expression for each square *s*  as well as the *if* and *in* statements in the list comprehension to
-qualify the three members of unitlist that *s* belongs to.
+expression for each square `s`  as well as the `if` and `in` statements in the list comprehension to
+qualify the three members of unitlist that `s` belongs to.
 
     !python
     units = dict((s, [u for u in unitlist if s in u])
                   for s in squares)
  
- The second dictionary, *peers*, determines the unique set of squares that constitute each square's
+ The second dictionary, `peers`, determines the unique set of squares that constitute each square's
  peers by taking the set difference of the union of the three units and the square itself (which is
  a member of all three units but is not its own peer). 
 
@@ -262,12 +262,108 @@ deprecated in newer versions of Python, and the following code should be used in
 
 * * * * *
  
+# Parsing and Initializing Grids
+
+These functions assume that an `assign` function has been defined, which we will cover next.
+Something surprising to non-Python programmers might be the `for s,d in ...` line in `parse_grid`.
+This is an example of tuple unpacking, and is used throughout Python when multiple values are needed
+on the left-hand side of an assignment.  The `zip` function can be thought of as a "tuple pack", it
+takes two sequences as arguments and returns a list of tuples, with each tuple containing the i-th
+element of each sequence.
+
+    !python
+    def parse_grid(grid):
+        """Convert grid to a dict of possible values, {square: digits}, or
+        return False if a contradiction is detected."""
+        ## To start, every square can be any digit; then assign values from the grid.
+        values = dict((s, digits) for s in squares)
+        for s,d in grid_values(grid).items():
+            if d in digits and not assign(values, s, d):
+                return False ## (Fail if we can't assign d to square s.)
+        return values
+
+    def grid_values(grid):
+        "Convert grid into a dict of {square: char} with '0' or '.' for empties."
+        chars = [c for c in grid if c in digits or c in '0.']
+        assert len(chars) == 81
+        return dict(zip(squares, chars))
+    
+* * * * *
+ 
 # Constraint Propagation
+
+Constraint propagation is the "secret sauce" of Norvig's Sudoku solver.  The key idea he employs is
+that assignments trigger eliminations, which can trigger more eliminations or assignments recursively.
+
+    !python
+    def assign(values, s, d):
+        """Eliminate all the other values (except d) from values[s] and propagate.
+        Return values, except return False if a contradiction is detected."""
+        other_values = values[s].replace(d, '')
+        if all(eliminate(values, s, d2) for d2 in other_values):
+            return values
+        else:
+            return False
+
+* * * * *
+
+# Elimination 
+
+    def eliminate(values, s, d):
+        """Eliminate d from values[s]; propagate when values or places <= 2.
+        Return values, except return False if a contradiction is detected."""
+        if d not in values[s]:
+            return values ## Already eliminated
+        values[s] = values[s].replace(d,'')
+        ## (1) If a square s is reduced to one value d2, then eliminate d2 from the peers.
+        if len(values[s]) == 0:
+            return False ## Contradiction: removed last value
+        elif len(values[s]) == 1:
+            d2 = values[s]
+            if not all(eliminate(values, s2, d2) for s2 in peers[s]):
+                return False
+        ## (2) If a unit u is reduced to only one place for a value d, then put it there.
+        for u in units[s]:
+            dplaces = [s for s in u if d in values[s]]
+            if len(dplaces) == 0:
+                return False ## Contradiction: no place for this value
+            elif len(dplaces) == 1:
+                # d can only be in one place in unit; assign it there
+                if not assign(values, dplaces[0], d):
+                    return False
+    return values
 
 * * * * *
 
 # Search
 
-* * * * *
+It turns out that for simple Sudoku puzzles, constraint propagation is sufficient enough to solve
+the puzzle completely.  For more difficult cases, Norvig uses a simple *depth-first search* that
+hypothesizes a trial assignment, then propagates and searches from the trial position until a
+contradiction (prune) or solution (done!) is found.  The search and solve code are very simple to
+write:
 
+    !python
+    
+    def solve(grid): return search(parse_grid(grid))
+
+    def search(values):
+        "Using depth-first search and propagation, try all possible values."
+        if values is False:
+            return False ## Failed earlier
+        if all(len(values[s]) == 1 for s in squares):
+            return values ## Solved!
+        ## Chose the unfilled square s with the fewest possibilities
+        n,s = min((len(values[s]), s) for s in squares if len(values[s]) > 1)
+        return some(search(assign(values.copy(), s, d))
+                    for d in values[s])
+
+The only real tricks to this code are the use of the `.copy` method on the mutable `values`
+dictionary for each trial, and Norvig's `some` function, which is defined with the misleading doc
+string:
+
+    !python
+    "Return some element of seq that is true."
+
+`some` more precisely returns the first element of `seq` that is True, and returns False otherwise.  
 
