@@ -279,8 +279,6 @@ Script 4
     import re
     pattern1 = "@Book{(.*),"
     pattern2 = "\s+title\s+=\s+{(.*)},"
-    book = ''
-    books = []
     for line in file('test.bib'):
     	match = re.search(pattern1,line)
     	if match: print "Found a book with the tag '%s'" % match.group(1)
