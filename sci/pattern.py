@@ -5,9 +5,12 @@
        v_t = D_2 \nabla^2 v + g(u,v)
 """
 
+import matplotlib
+matplotlib.use('TkAgg')
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse import spdiags,linalg,eye
+from time import sleep
 
 #Parameter values
 Du=0.500; Dv=1;
@@ -56,8 +59,10 @@ Y,X = np.meshgrid(y,x)
 # Initial data
 u=np.random.randn(m,m)/2.;
 v=np.random.randn(m,m)/2.;
+plt.hold(False)
 plt.pcolormesh(x,y,u)
-plt.colorbar; plt.axis('image'); plt.draw()
+plt.colorbar; plt.axis('image'); 
+plt.draw()
 u=u.reshape(-1)
 v=v.reshape(-1)
 
@@ -69,7 +74,7 @@ dt=h/delta/5.;
 plt.ion()
 
 #Now step forward in time
-for k in range(300):
+for k in range(120):
     #Simple (1st-order) operator splitting:
     u = linalg.spsolve(II-dt*delta*Du*A,u)
     v = linalg.spsolve(II-dt*delta*Dv*A,v)
@@ -85,6 +90,7 @@ for k in range(300):
         plt.pcolormesh(x,y,U)
         plt.colorbar
         plt.axis('image')
+	plt.title(str(t))
         plt.draw()
 
 plt.ioff()
