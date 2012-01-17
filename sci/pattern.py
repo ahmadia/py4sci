@@ -6,6 +6,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.sparse import spdiags,linalg,eye
 
 #Parameter values
 Du=0.500; Dv=1;
@@ -40,54 +41,77 @@ def f(u,v):
 def g(u,v):
     return beta*v*(1+alpha*tau1/beta*u*v) + u*(gamma+tau2*v);
 
+
+def five_pt_laplacian(m,a,b):
+    e=np.ones(m**2)
+    e2=([0]+[1]*(m-1))*m
+    h=(b-a)/(m+1)
+    A=np.diag(-4*e,0)+np.diag(e2[1:],-1)+np.diag(e2[1:],1)+np.diag(e[m:],m)+np.diag(e[m:],-m)
+    A/=h**2
+    return A
+
+def five_pt_laplacian_sparse(m,a,b):
+    e=np.ones(m**2)
+    e2=([1]*(m-1)+[0])*m
+    e3=([0]+[1]*(m-1))*m
+    h=(b-a)/(m+1)
+    A=spdiags([-4*e,e2,e3,e,e],[0,-1,1,-m,m],m**2,m**2)
+    A/=h**2
+    return A
+
 #Grid
-nx=50.; ny=nx; dx=2/nx; dy=2/ny;
-X = np.linspace(-1,1,nx)
-Y = np.linspace(-1,1,ny)
-Y,X = np.meshgrid(Y,X)
+a=-1.; b=1.
+m=100; h=(b-a)/m; 
+x = np.linspace(-1,1,m)
+y = np.linspace(-1,1,m)
+Y,X = np.meshgrid(y,x)
 
-u=np.random.randn(x.shape)/2.;
-v=np.random.randn(x.shape)/2.;
+u=np.random.randn(m,m)/2.;
+v=np.random.randn(m,m)/2.;
 
 
-plt.pcolor(x,y,u)
-plt.colorbar; plt.axis('image')
-dt=dx/delta/50;
+plt.pcolormesh(x,y,u)
+plt.colorbar; plt.axis('image'); plt.draw()
+dt=h/delta/5.;
 
-A=diffusion_A(nx);
-A=A/dx^2;
-II=speye(nx^2);
+A=five_pt_laplacian_sparse(m,-1.,1.);
+II=eye(m*m,m*m)
 
-i=1:nx; j=1:ny; t=0;
-#i=2:nx-1; j=2:ny-1; t=0;
-u=reshape(u,nx*nx,1);
-v=reshape(v,nx*nx,1);
-for k=1:10000
+u=u.reshape(-1)
+v=v.reshape(-1)
 
-#BCs:
-#  u(1,:)=u(end-1,:);
-#  u(end,:)=u(2,:);
-#  u(:,1)=u(:,end-1);
-#  u(:,end)=u(:,2);
-##  Explicit diffusion:
-#  u(i,j)=u(i,j) + dt*((u(i-1,j)-2*u(i,j)+u(i+1,j))/dx^2 ...
-#                   + (u(i,j-1)-2*u(i,j)+u(i,j+1))/dy^2);
-#  v(i,j)=v(i,j) + delta*Dv*dt*((v(i-1,j)-2*v(i,j)+v(i+1,j))/dx^2 ...
-#                   + (v(i,j-1)-2*v(i,j)+v(i,j+1))/dy^2);
+t=0.
 
-#Simple (1st-order) IMEX:
-  u=be_step(u,delta*Du*A,dt);
-  v=be_step(v,delta*Dv*A,dt);
+plt.ion()
 
-  unew=u+dt*f(u,v);
-  v   =v+dt*g(u,v);
-  u=unew;
-  t=t+dt;
+for k in range(300):
+    #i=1:m; j=1:m; t=0;
+    #i=2:m-1; j=2:m-1; t=0;
+    #BCs:
+    #  u(1,:)=u(end-1,:);
+    #  u(end,:)=u(2,:);
+    #  u(:,1)=u(:,end-1);
+    #  u(:,end)=u(:,2);
+    ##  Explicit diffusion:
+    #  u(i,j)=u(i,j) + dt*((u(i-1,j)-2*u(i,j)+u(i+1,j))/dx^2 ...
+    #                   + (u(i,j-1)-2*u(i,j)+u(i,j+1))/dy^2);
+    #  v(i,j)=v(i,j) + delta*Dv*dt*((v(i-1,j)-2*v(i,j)+v(i+1,j))/dx^2 ...
+    #                   + (v(i,j-1)-2*v(i,j)+v(i,j+1))/dy^2);
 
-  if floor(k/10)==k/10
-    up = reshape(u,nx,ny);
-    pcolor(x(i,j),y(i,j),up(i,j)); shading interp; colorbar; title(num2str(t));
-    colormap(hsv); axis image
-    pause(0.01);
-  end
-end
+    #Simple (1st-order) IMEX:
+    u = linalg.spsolve(II-dt*delta*Du*A,u)
+    v = linalg.spsolve(II-dt*delta*Dv*A,v)
+
+    unew=u+dt*f(u,v);
+    v   =v+dt*g(u,v);
+    u=unew;
+    t=t+dt;
+
+    if k/3==float(k)/3:
+        U=u.reshape((m,m))
+        plt.pcolormesh(x,y,U)
+        plt.colorbar
+        plt.axis('image')
+        plt.draw()
+
+plt.ioff()
