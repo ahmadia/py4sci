@@ -193,6 +193,7 @@ Beginner's Guide
 Script 1
 --------
 
+    !python
     #!/usr/bin/env python
     import sys,math
     try:
@@ -208,6 +209,7 @@ Script 1
 Script 2
 --------
 
+    !python
     #!/usr/bin/env python
     import sys,math
     try:
@@ -242,6 +244,7 @@ How to format
 Script 3
 --------
 
+    !python
     import sys,os
     cmd = 'date'
     output = os.popen(cmd)
@@ -257,6 +260,7 @@ Script 3
 A Bib-file
 ----------
 
+    !latex
     @Book{Langtangen2011,
       author = 	  {Hans Petter Langtangen},
       title = 	  {A Primer on Scientific Programming with Python},
@@ -275,6 +279,7 @@ A Bib-file
 Script 4
 --------
 
+    !python
     #!/usr/bin/env python
     import re
     pattern1 = "@Book{(.*),"
